@@ -70,8 +70,8 @@ async def upload_document(file: UploadFile = File(...)):
         "file_path": file_path,
         "status": "",
         "error_message": None,
+        "file_hash": "",
         "raw_text": "",
-        "metadata": {},
         "chunks": [],
     }
 

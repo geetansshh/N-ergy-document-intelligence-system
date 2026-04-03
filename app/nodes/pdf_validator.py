@@ -68,16 +68,16 @@ def validate_pdf(state: AgentState) -> dict:
                 google_api_key=os.getenv("GOOGLE_API_KEY")
             )
             vectorstore = Chroma(persist_directory=CHROMA_DIR, embedding_function=embeddings)
-            existing = vectorstore.get(where={"file_hash": file_hash}, limit=1)
+            existing = vectorstore.get(where={"file_hash": file_hash})
             if existing and existing.get("ids"):
                 print(f"----- VALIDATOR: Duplicate detected — skipping ingestion -----")
-                return {"status": "DUPLICATE", "error_message": None}
+                return {"status": "DUPLICATE", "error_message": None, "file_hash": file_hash}
         except Exception:
             # If chroma is empty or unavailable, proceed normally
             pass
 
         print(f"----- VALIDATOR: Status = {pdf_status} -----")
-        return {"status": pdf_status, "error_message": None, "metadata": {"file_hash": file_hash}}
+        return {"status": pdf_status, "error_message": None, "file_hash": file_hash}
 
     except Exception as e:
         return {"status": "ERROR", "error_message": str(e)}

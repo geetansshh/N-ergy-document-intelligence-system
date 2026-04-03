@@ -1,7 +1,7 @@
 import os
 from typing import List
 from langchain_core.documents import Document
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 from app.state import AgentState
 
@@ -39,14 +39,15 @@ def hallucination_guard(state: AgentState) -> dict:
     context = "\n\n".join(doc.page_content for doc in docs)
 
     prompt = ChatPromptTemplate.from_template("""
-You are a strict fact-checking auditor.
+You are a fact-checking auditor. Your job is to detect hallucinations — fabricated facts not supported by the source.
 
-Verify whether the AI-generated answer below is FULLY supported by the source context provided.
+Verify whether the AI-generated answer below is supported by the source context.
 
 RULES:
 - Reply ONLY with "GROUNDED" or "HALLUCINATED". One word. No punctuation. No explanation.
-- Reply "GROUNDED" if every factual claim in the answer can be directly traced to the context.
-- Reply "HALLUCINATED" if the answer contains any fact, number, name, or claim NOT present in the context.
+- Reply "GROUNDED" if the answer is a reasonable synthesis or paraphrase of the context, even if not word-for-word.
+- Reply "GROUNDED" if the answer says it cannot find relevant information (that is a safe, honest response).
+- Reply "HALLUCINATED" ONLY if the answer states specific facts, numbers, names, or claims that are clearly NOT in the context and could not be inferred from it.
 
 SOURCE CONTEXT:
 {context}
@@ -58,10 +59,10 @@ VERDICT:
 """)
 
     try:
-        llm = ChatGoogleGenerativeAI(
-            model="gemini-2.0-flash",
+        llm = ChatGroq(
+            model="llama-3.3-70b-versatile",
             temperature=0,
-            google_api_key=os.getenv("GOOGLE_API_KEY")
+            api_key=os.getenv("GROQ_API_KEY")
         )
         chain = prompt | llm
         response = chain.invoke({"context": context, "answer": final_answer})

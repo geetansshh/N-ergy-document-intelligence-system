@@ -1,5 +1,5 @@
 import os
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 from app.state import AgentState
 
@@ -35,10 +35,10 @@ Return ONLY the reformulated question. No explanation.
 
 ORIGINAL QUESTION: {question}
 """)
-        llm = ChatGoogleGenerativeAI(
-            model="gemini-2.0-flash",
+        llm = ChatGroq(
+            model="llama-3.3-70b-versatile",
             temperature=0.4,
-            google_api_key=os.getenv("GOOGLE_API_KEY")
+            api_key=os.getenv("GROQ_API_KEY")
         )
         chain = prompt | llm
         response = chain.invoke({"question": question})

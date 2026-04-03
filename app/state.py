@@ -7,6 +7,7 @@ class AgentState(TypedDict, total=False):
     file_path: str
     status: str                        # READY | SCANNED | REJECTED | ERROR | DUPLICATE
     error_message: Optional[str]
+    file_hash: str                     # SHA-256 of PDF bytes (for dedup)
     raw_text: str                      # Markdown output from Docling
     chunks: List[Document]             # Final chunks with metadata
 

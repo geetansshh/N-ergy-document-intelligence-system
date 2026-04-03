@@ -4,7 +4,8 @@ import pickle
 from typing import List
 from langchain_core.documents import Document
 from langchain_community.vectorstores import Chroma
-from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
+from langchain_groq import ChatGroq
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_core.prompts import ChatPromptTemplate
 from rank_bm25 import BM25Okapi
 from app.state import AgentState
@@ -134,10 +135,10 @@ DOCUMENT CONTENT:
 {context}
 """)
 
-        llm = ChatGoogleGenerativeAI(
-            model="gemini-2.0-flash",
+        llm = ChatGroq(
+            model="llama-3.3-70b-versatile",
             temperature=0.2,
-            google_api_key=os.getenv("GOOGLE_API_KEY")
+            api_key=os.getenv("GROQ_API_KEY")
         )
         chain = prompt | llm
         response = chain.invoke({"context": context})
