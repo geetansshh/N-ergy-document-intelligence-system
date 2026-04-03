@@ -35,11 +35,10 @@ if "chat_history" not in st.session_state:
 # ── Sidebar ───────────────────────────────────────────────────────────────────
 with st.sidebar:
     st.header("⚙️ Embedding Provider")
-    _embed_options = ["gemini", "bge", "local"]
+    _embed_options = ["gemini", "bge"]
     _embed_labels = {
         "gemini": "Google Gemini API (3072 dims)",
         "bge":    "BAAI/bge-large-en-v1.5 — GPU (1024 dims)",
-        "local":  "all-MiniLM-L6-v2 — GPU/CPU (384 dims, fast)",
     }
     provider = st.radio(
         "Choose embedding model",

@@ -70,9 +70,9 @@ The system supports two pluggable provider axes — embeddings and LLM — contr
 | Value | Model | Notes |
 |---|---|---|
 | `gemini` (default) | `gemini-embedding-001` (3072 dims) | Requires `GOOGLE_API_KEY`, subject to API quota |
-| `local` | `all-MiniLM-L6-v2` (384 dims) | Runs on GPU if available, no API cost or quota |
+| `bge` | `BAAI/bge-large-en-v1.5` (1024 dims) | Runs on GPU, no API cost or quota, top MTEB retrieval scores |
 
-Each provider writes to its own ChromaDB directory (`chroma_db/` vs `chroma_db_local/`) to avoid dimension mismatch errors. Re-ingest documents after switching.
+Each provider writes to its own ChromaDB directory (`chroma_db/` vs `chroma_db_bge/`) to avoid dimension mismatch errors. Re-ingest documents after switching.
 
 ### LLM Provider (`LLM_PROVIDER`)
 
@@ -168,7 +168,7 @@ Each uploaded PDF is hashed before ingestion. If the hash already exists in Chro
 Every answer includes an inline citation per claim (e.g. `[1]`, `[2]`) and a footer listing filename + Markdown section hierarchy for each source block. Users can verify every claim against the original document.
 
 ### 9. Pluggable Embedding and LLM Providers
-Both the embedding model and the generation LLM are resolved at call time from `app/embeddings.py` and `app/llm.py` respectively. Switching providers requires only an environment variable change — no code changes. The local embedding option (`all-MiniLM-L6-v2`) eliminates API quota errors during heavy testing by running entirely on the available GPU/CPU.
+Both the embedding model and the generation LLM are resolved at call time from `app/embeddings.py` and `app/llm.py` respectively. Switching providers requires only an environment variable change — no code changes. The local embedding option (`BAAI/bge-large-en-v1.5`) eliminates API quota errors during heavy testing by running entirely on the available GPU, while delivering top-tier retrieval quality (1024-dim embeddings, state-of-the-art MTEB scores).
 
 ### 10. Depth-Adaptive Answer Generation
 The generator prompt instructs the LLM to match response depth to the question: structured, detailed answers with headings or bullets for broad overview questions ("what is this about", "summarise"), and precise direct answers for specific factual questions.

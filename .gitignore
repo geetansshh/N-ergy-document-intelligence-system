@@ -21,7 +21,6 @@ env/
 # Vector store & uploads (runtime data)
 chroma_db/
 chroma_db_bge/
-chroma_db_local/
 uploaded_pdfs/
 bm25_index/
 
