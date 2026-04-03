@@ -35,12 +35,19 @@ if "chat_history" not in st.session_state:
 # ── Sidebar ───────────────────────────────────────────────────────────────────
 with st.sidebar:
     st.header("⚙️ Embedding Provider")
+    _embed_options = ["gemini", "bge", "local"]
+    _embed_labels = {
+        "gemini": "Google Gemini API (3072 dims)",
+        "bge":    "BAAI/bge-large-en-v1.5 — GPU (1024 dims)",
+        "local":  "all-MiniLM-L6-v2 — GPU/CPU (384 dims, fast)",
+    }
     provider = st.radio(
         "Choose embedding model",
-        options=["gemini", "local"],
-        format_func=lambda x: "Google Gemini (API)" if x == "gemini" else "Local — all-MiniLM-L6-v2 (GPU/CPU)",
-        index=0 if st.session_state.embedding_provider == "gemini" else 1,
-        help="Local uses sentence-transformers on your GPU/CPU — no API quota.",
+        options=_embed_options,
+        format_func=lambda x: _embed_labels[x],
+        index=_embed_options.index(st.session_state.embedding_provider)
+              if st.session_state.embedding_provider in _embed_options else 0,
+        help="Each option uses a separate index. Re-ingest PDFs after switching.",
     )
     if provider != st.session_state.embedding_provider:
         st.session_state.embedding_provider = provider
