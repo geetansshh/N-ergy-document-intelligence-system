@@ -4,11 +4,10 @@ import pickle
 from typing import List, Dict, Tuple
 from langchain_core.documents import Document
 from langchain_community.vectorstores import Chroma
-from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from rank_bm25 import BM25Okapi
 from app.state import AgentState
+from app.embeddings import get_embeddings, get_chroma_dir
 
-CHROMA_DIR = "./chroma_db"
 BM25_DIR = "./bm25_index"
 
 # Dense retrieval relevance threshold.
@@ -93,11 +92,8 @@ def retrieve_chunks(state: AgentState) -> dict:
 
     try:
         # --- Dense retriever setup ---
-        embeddings = GoogleGenerativeAIEmbeddings(
-            model="models/gemini-embedding-001",
-            google_api_key=os.getenv("GOOGLE_API_KEY")
-        )
-        vectorstore = Chroma(persist_directory=CHROMA_DIR, embedding_function=embeddings)
+        embeddings = get_embeddings()
+        vectorstore = Chroma(persist_directory=get_chroma_dir(), embedding_function=embeddings)
 
         # --- BM25 retriever setup ---
         corpus, bm25_meta = _load_bm25_store()

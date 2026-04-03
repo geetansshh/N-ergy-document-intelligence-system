@@ -1,8 +1,7 @@
-import os
 from typing import List
-from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 from app.state import AgentState
+from app.llm import get_llm
 
 
 def generate_queries(state: AgentState) -> dict:
@@ -43,11 +42,7 @@ Return ONLY the 2 alternative questions, one per line. No numbering, no labels, 
 ORIGINAL QUESTION: {question}
 """)
 
-        llm = ChatGroq(
-            model="llama-3.3-70b-versatile",
-            temperature=0.3,
-            api_key=os.getenv("GROQ_API_KEY")
-        )
+        llm = get_llm(temperature=0.3)
         chain = prompt | llm
         response = chain.invoke({"question": question})
 

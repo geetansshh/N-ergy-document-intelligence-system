@@ -7,7 +7,7 @@ from app.state import AgentState
 _cross_encoder = None
 
 # Final number of chunks passed to the generator
-TOP_K = 6
+TOP_K = 10
 # MMR diversity penalty weight (λ): 1.0 = pure relevance, 0.0 = pure diversity
 MMR_LAMBDA = 0.6
 

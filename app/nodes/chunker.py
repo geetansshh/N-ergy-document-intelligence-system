@@ -97,6 +97,7 @@ def chunk_document(state: AgentState) -> dict:
     raw_markdown = state.get("raw_text", "")
     file_path = state.get("file_path", "")
     file_hash = state.get("file_hash", "")
+    original_filename = state.get("original_filename") or os.path.basename(file_path)
 
     print(f"----- CHUNKER: Processing {file_path} -----")
 
@@ -118,7 +119,7 @@ def chunk_document(state: AgentState) -> dict:
 
         base_metadata = {
             "source": file_path,
-            "filename": os.path.basename(file_path),
+            "filename": original_filename,
             "file_hash": file_hash,
         }
 

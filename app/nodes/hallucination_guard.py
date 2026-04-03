@@ -1,9 +1,8 @@
-import os
 from typing import List
 from langchain_core.documents import Document
-from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 from app.state import AgentState
+from app.llm import get_llm
 
 
 def hallucination_guard(state: AgentState) -> dict:
@@ -59,24 +58,21 @@ VERDICT:
 """)
 
     try:
-        llm = ChatGroq(
-            model="llama-3.3-70b-versatile",
-            temperature=0,
-            api_key=os.getenv("GROQ_API_KEY")
-        )
+        llm = get_llm(temperature=0)
         chain = prompt | llm
         response = chain.invoke({"context": context, "answer": final_answer})
         verdict = response.content.strip().upper() if isinstance(response.content, str) else "GROUNDED"
+        # Keep only the first word to ignore any extra explanation the LLM adds
+        first_word = verdict.split()[0] if verdict.split() else "GROUNDED"
 
-        print(f"----- HALLUCINATION GUARD: Verdict = {verdict} -----")
+        print(f"----- HALLUCINATION GUARD: Verdict = {first_word} -----")
 
-        if "HALLUCINATED" in verdict:
-            return {
-                "final_answer": (
-                    "The generated response could not be fully verified against the source documents. "
-                    "Please rephrase your question or upload additional supporting documents."
-                )
-            }
+        if first_word == "HALLUCINATED":
+            warning = (
+                "\n\n> ⚠️ **Verification warning:** This answer could not be fully confirmed "
+                "against the source chunks. Treat it with caution."
+            )
+            return {"final_answer": final_answer + warning}
         return {}
 
     except Exception as e:

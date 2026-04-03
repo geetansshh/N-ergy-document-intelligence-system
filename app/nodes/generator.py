@@ -1,9 +1,8 @@
-import os
 from typing import List
 from langchain_core.documents import Document
-from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 from app.state import AgentState
+from app.llm import get_llm
 
 
 def _build_context(docs: List[Document]) -> tuple[str, list[dict]]:
@@ -77,7 +76,10 @@ RULES:
 1. Answer strictly from the context. Do not use outside knowledge.
 2. Cite your sources inline using block numbers, e.g. [1], [2].
 3. If the context does not contain enough information, say: "The documents do not contain sufficient information to answer this question."
-4. Be concise and factual. Do not speculate.
+4. Match the depth of your answer to the question:
+   - For broad or overview questions (e.g. "what is this about", "summarise", "overview"), write a thorough, structured response that covers all major topics found across the context blocks. Use headings or bullet points where helpful.
+   - For specific factual questions, be direct and precise.
+5. Do not speculate or add information not found in the context.
 
 CONTEXT:
 {context}
@@ -88,11 +90,7 @@ ANSWER:
 """)
 
     try:
-        llm = ChatGroq(
-            model="llama-3.3-70b-versatile",
-            temperature=0,
-            api_key=os.getenv("GROQ_API_KEY")
-        )
+        llm = get_llm(temperature=0)
         chain = prompt | llm
         response = chain.invoke({"context": context, "question": question})
 

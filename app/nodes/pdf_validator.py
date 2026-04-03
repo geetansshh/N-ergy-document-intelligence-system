@@ -2,10 +2,8 @@ import hashlib
 import os
 import fitz  # PyMuPDF
 from langchain_community.vectorstores import Chroma
-from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from app.state import AgentState
-
-CHROMA_DIR = "./chroma_db"
+from app.embeddings import get_embeddings, get_chroma_dir
 
 
 def _sha256(file_path: str) -> str:
@@ -63,11 +61,8 @@ def validate_pdf(state: AgentState) -> dict:
         print(f"----- VALIDATOR: SHA-256 = {file_hash[:12]}... -----")
 
         try:
-            embeddings = GoogleGenerativeAIEmbeddings(
-                model="models/gemini-embedding-001",
-                google_api_key=os.getenv("GOOGLE_API_KEY")
-            )
-            vectorstore = Chroma(persist_directory=CHROMA_DIR, embedding_function=embeddings)
+            embeddings = get_embeddings()
+            vectorstore = Chroma(persist_directory=get_chroma_dir(), embedding_function=embeddings)
             existing = vectorstore.get(where={"file_hash": file_hash})
             if existing and existing.get("ids"):
                 print(f"----- VALIDATOR: Duplicate detected — skipping ingestion -----")

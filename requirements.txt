@@ -32,3 +32,6 @@ rank-bm25
 
 # Google Generative AI SDK
 google-generativeai
+
+# Streamlit UI
+streamlit

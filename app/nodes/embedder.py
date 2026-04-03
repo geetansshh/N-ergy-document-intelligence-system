@@ -4,11 +4,10 @@ import pickle
 from typing import List
 from langchain_core.documents import Document
 from langchain_community.vectorstores import Chroma
-from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from rank_bm25 import BM25Okapi
 from app.state import AgentState
+from app.embeddings import get_embeddings, get_chroma_dir
 
-CHROMA_DIR = "./chroma_db"
 BM25_DIR = "./bm25_index"
 
 
@@ -69,14 +68,11 @@ def embed_documents(state: AgentState) -> dict:
 
     try:
         # --- 1. Dense embeddings → ChromaDB ---
-        embeddings = GoogleGenerativeAIEmbeddings(
-            model="models/gemini-embedding-001",
-            google_api_key=os.getenv("GOOGLE_API_KEY")
-        )
+        embeddings = get_embeddings()
         Chroma.from_documents(
             documents=chunks,
             embedding=embeddings,
-            persist_directory=CHROMA_DIR
+            persist_directory=get_chroma_dir()
         )
         print(f"----- EMBEDDER: {len(chunks)} chunks saved to ChromaDB -----")
 

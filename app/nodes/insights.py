@@ -4,13 +4,12 @@ import pickle
 from typing import List
 from langchain_core.documents import Document
 from langchain_community.vectorstores import Chroma
-from langchain_groq import ChatGroq
-from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_core.prompts import ChatPromptTemplate
 from rank_bm25 import BM25Okapi
 from app.state import AgentState
+from app.embeddings import get_embeddings, get_chroma_dir
+from app.llm import get_llm
 
-CHROMA_DIR = "./chroma_db"
 BM25_DIR = "./bm25_index"
 
 # Multiple broad probe queries to get diverse coverage of the document corpus
@@ -51,11 +50,8 @@ def generate_insights(state: AgentState) -> dict:
     print("----- INSIGHTS: Generating insights from document corpus -----")
 
     try:
-        embeddings = GoogleGenerativeAIEmbeddings(
-            model="models/gemini-embedding-001",
-            google_api_key=os.getenv("GOOGLE_API_KEY")
-        )
-        vectorstore = Chroma(persist_directory=CHROMA_DIR, embedding_function=embeddings)
+        embeddings = get_embeddings()
+        vectorstore = Chroma(persist_directory=get_chroma_dir(), embedding_function=embeddings)
 
         # Load BM25
         corpus_path = os.path.join(BM25_DIR, "corpus.pkl")
@@ -135,11 +131,7 @@ DOCUMENT CONTENT:
 {context}
 """)
 
-        llm = ChatGroq(
-            model="llama-3.3-70b-versatile",
-            temperature=0.2,
-            api_key=os.getenv("GROQ_API_KEY")
-        )
+        llm = get_llm(temperature=0.2)
         chain = prompt | llm
         response = chain.invoke({"context": context})
 

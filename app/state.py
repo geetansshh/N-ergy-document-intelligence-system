@@ -5,6 +5,7 @@ from langchain_core.documents import Document
 class AgentState(TypedDict, total=False):
     # --- Ingestion ---
     file_path: str
+    original_filename: str             # Original filename before temp-file renaming
     status: str                        # READY | SCANNED | REJECTED | ERROR | DUPLICATE
     error_message: Optional[str]
     file_hash: str                     # SHA-256 of PDF bytes (for dedup)
